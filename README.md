@@ -6,6 +6,6 @@ A simple repo full of simplefied documentation to be used as AI context for buil
 
 # Contributing
 If you want to contribute simplified documentation or examples, please follow these guidelines:
-• Keep examples short and minimal.
-• Use plain language and avoid unnecessary complexity.
-• Ensure examples are well-tested and up-to-date.
+- keep the examples short and minimal
+- use plain language and avoid unnecessary complexity
+- ensure examples are well-tested and up-to-date
