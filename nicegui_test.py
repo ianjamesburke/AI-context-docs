@@ -1,5 +1,6 @@
 from nicegui import ui
 from typing import Dict
+import time
 
 ### VARIABLES
 
@@ -68,6 +69,8 @@ rows = [
 ### COMPONENTS
 
 def chat_window():
+    scroll_area = None  # Initialize scroll_area to None
+
     def on_click(text_input):
         user_message = text_input.value
         if user_message:
@@ -77,18 +80,19 @@ def chat_window():
             text_input.value = ''
             # Refresh the chat window
             display_chat_messages.refresh()
-            # Scroll to the bottom of the chat window
-            ui.run_javascript('window.scrollTo(0, document.body.scrollHeight)')
             # Simulate sending the message to the backend and receiving a response
             response = {"role": "assistant", "content": "This is a response from the backend."}
             message_list.append(response)
             # Refresh the chat window again
             display_chat_messages.refresh()
-            
+            # Scroll to the bottom of the chat window
+            if scroll_area:
+                scroll_area.scroll_to(percent=1)
 
     @ui.refreshable
     def display_chat_messages():
-        with ui.scroll_area().classes('w-full h-[75vh] border'):
+        nonlocal scroll_area  # Declare scroll_area as nonlocal to modify it
+        with ui.scroll_area().classes('w-full h-[75vh] border') as scroll_area:
             with ui.column().classes('w-full h-full items-stretch'):
                 for message in message_list:
                     if message['role'] == 'user':
