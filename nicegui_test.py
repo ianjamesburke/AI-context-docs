@@ -90,7 +90,7 @@ def on_click(text_input):
 
 @ui.refreshable
 def display_chat_messages():
-    with ui.scroll_area().classes('w-full h-64px border'):
+    with ui.scroll_area().classes('w-full h-[75vh] border'):
         with ui.column().classes('w-full h-full items-stretch'):
             for message in message_list:
                 if message['role'] == 'user':
