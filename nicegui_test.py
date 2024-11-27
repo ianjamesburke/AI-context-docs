@@ -56,10 +56,6 @@ rows = [
     {'id': 'ADID72', 'name': 'Frank', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 7", "new_column_2": "Data 8"},
     {'id': 'ADID73', 'name': 'Grace', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 9", "new_column_2": "Data 10"},
     {'id': 'ADID74', 'name': 'Heidi', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 11", "new_column_2": "Data 12"},
-    {'id': 'ADID75', 'name': 'Ivan', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 13", "new_column_2": "Data 14"},
-    {'id': 'ADID76', 'name': 'Judy', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 15", "new_column_2": "Data 16"},
-    {'id': 'ADID77', 'name': 'Karl', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 17", "new_column_2": "Data 18"},
-    {'id': 'ADID78', 'name': 'Laura', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 19", "new_column_2": "Data 20"},
 ]
 
 
@@ -94,12 +90,13 @@ def on_click(text_input):
 
 @ui.refreshable
 def display_chat_messages():
-    with ui.column().classes('w-full h-full items-stretch'):
-        for message in message_list:
-            if message['role'] == 'user':
-                ui.label(f"{message['role']}: {message['content']}").classes('ml-auto my-2')
-            else:
-                ui.label(f"{message['role']}: {message['content']}").classes('mr-auto my-2')
+    with ui.scroll_area().classes('w-full h-64px border'):
+        with ui.column().classes('w-full h-full items-stretch'):
+            for message in message_list:
+                if message['role'] == 'user':
+                    ui.label(f"{message['role']}: {message['content']}").classes('ml-auto my-2')
+                else:
+                    ui.label(f"{message['role']}: {message['content']}").classes('mr-auto my-2')
 
 def text_input():
     with ui.column().classes('w-full'):
