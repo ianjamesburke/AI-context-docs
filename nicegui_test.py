@@ -36,12 +36,6 @@ columns = [
     {'name': 'new_column_2', 'label': 'New Column 2', 'field': 'new_column_2'},
     {'name': 'new_column_3', 'label': 'New Column 3', 'field': 'new_column_3'},
     {'name': 'new_column_4', 'label': 'New Column 4', 'field': 'new_column_4'},
-    {'name': 'new_column_5', 'label': 'New Column 5', 'field': 'new_column_5'},
-    {'name': 'new_column_6', 'label': 'New Column 6', 'field': 'new_column_6'},
-    {'name': 'new_column_7', 'label': 'New Column 7', 'field': 'new_column_7'},
-    {'name': 'new_column_8', 'label': 'New Column 8', 'field': 'new_column_8'},
-    {'name': 'new_column_9', 'label': 'New Column 9', 'field': 'new_column_9'},
-    {'name': 'new_column_10', 'label': 'New Column 10', 'field': 'new_column_10'},
 ]
 
 
@@ -63,22 +57,7 @@ rows = [
 
 ### FUNCTIONS
 
-def on_click(text_input):
-    user_message = text_input.value
-    if user_message:
-        # Append the user input to the message_list
-        message_list.append({"role": "user", "content": user_message})
-        # Clear the text input
-        text_input.value = ''
-        # Refresh the chat window
-        display_chat_messages.refresh()
-        # Scroll to the bottom of the chat window
-        ui.run_javascript('window.scrollTo(0, document.body.scrollHeight)')
-        # Simulate sending the message to the backend and receiving a response
-        response = {"role": "assistant", "content": "This is a response from the backend."}
-        message_list.append(response)
-        # Refresh the chat window again
-        display_chat_messages.refresh()
+
 
 
 
@@ -88,31 +67,46 @@ def on_click(text_input):
 
 ### COMPONENTS
 
-@ui.refreshable
-def display_chat_messages():
-    with ui.scroll_area().classes('w-full h-[75vh] border'):
-        with ui.column().classes('w-full h-full items-stretch'):
-            for message in message_list:
-                if message['role'] == 'user':
-                    ui.label(f"{message['role']}: {message['content']}").classes('ml-auto my-2')
-                else:
-                    ui.label(f"{message['role']}: {message['content']}").classes('mr-auto my-2')
-
-def text_input():
-    with ui.column().classes('w-full'):
-        with ui.row().classes('w-full no-wrap items-center'):
-            text = ui.input(placeholder='Type your message here...').props('rounded outlined input-class=mx-3') \
-                .classes('flex-grow')
-            ui.button('Submit', on_click=lambda: on_click(text))
-
-
-
 def chat_window():
+    def on_click(text_input):
+        user_message = text_input.value
+        if user_message:
+            # Append the user input to the message_list
+            message_list.append({"role": "user", "content": user_message})
+            # Clear the text input
+            text_input.value = ''
+            # Refresh the chat window
+            display_chat_messages.refresh()
+            # Scroll to the bottom of the chat window
+            ui.run_javascript('window.scrollTo(0, document.body.scrollHeight)')
+            # Simulate sending the message to the backend and receiving a response
+            response = {"role": "assistant", "content": "This is a response from the backend."}
+            message_list.append(response)
+            # Refresh the chat window again
+            display_chat_messages.refresh()
+            
+
+    @ui.refreshable
+    def display_chat_messages():
+        with ui.scroll_area().classes('w-full h-[75vh] border'):
+            with ui.column().classes('w-full h-full items-stretch'):
+                for message in message_list:
+                    if message['role'] == 'user':
+                        ui.label(f"{message['role']}: {message['content']}").classes('ml-auto my-2')
+                    else:
+                        ui.label(f"{message['role']}: {message['content']}").classes('mr-auto my-2')
+
+    def text_input():
+        with ui.column().classes('w-full'):
+            with ui.row().classes('w-full no-wrap items-center'):
+                text = ui.input(placeholder='Type your message here...').props('rounded outlined input-class=mx-3') \
+                    .classes('flex-grow')
+                ui.button('Submit', on_click=lambda: on_click(text))
+
     with ui.column().classes('w-full h-full items-stretch'):
         ui.label('Chat Window').classes('text-center text-xl my-4')
-    display_chat_messages()
-    text_input()
-        
+        display_chat_messages()
+        text_input()
 
 
 def ads_table():
