@@ -39,29 +39,17 @@ rows = [
     {'id': 'ADID71', 'name': 'Eve', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 5", "new_column_2": "Data 6"},
 ]
 
-### VARIABLES FOR NEW FEATURE
-# the table data that will be coming from the back,
-# - call colums by name, 
-tables_data = [
-    {
-        'id': 1,
-        'name': 'thick gurls',
-        'columns': ['thumbnail', 'id', 'name', 'status', 'spend', 'email', 'phone', 'address'],
-        'rows': [
-            {'id': 'ADID67', 'name': 'Alice', 'status': 'active', "thumbnail": "https://via.placeholder.com/150"},
-            {'id': 'ADID68', 'name': 'Bob', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "spend": 100},
-        ]
-    }
-] 
 
-# TODO: map the columns from the table data to the column options defined in the columns variable
+default_table_data = {
+    'id': 1,
+    'table_name': 'thick gurls',
+    'rows': [
+        {'id': 'ADID67', 'name': 'Alice', 'status': 'active', "thumbnail": "https://via.placeholder.com/150"},
+        {'id': 'ADID68', 'name': 'Bob', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "spend": 100},
+    ]
+}
 
-
-
-
-
-
-
+tables_data = [default_table_data]
 
 
 
@@ -111,32 +99,44 @@ def chat_window():
         display_chat_messages()
         text_input()
 
-def ads_table(table_data):
+def data_table_element(table_data):
+
+    # create a column list from the items in the rows
+    columns = [col for col in table_data['rows'][0].keys()]
+    # use these collums to pick collumns form the column definitions
+    visible_columns = [col for col in column_definitions if col['name'] in columns]
+
+
     def toggle(column: Dict, visible: bool) -> None:
-        column['classes'] = '' if visible else 'hidden'
-        column['headerClasses'] = '' if visible else 'hidden'
-        table.update()
+        column['visible'] = visible
+        # Update the visible_columns list based on the new visibility status
+        if visible:
+            if column not in visible_columns:
+                visible_columns.append(column)
+        else:
+            visible_columns[:] = [col for col in visible_columns if col['name'] != column['name']]
+        table.update()  # Refresh the table to reflect changes
 
     def column_toggle_menu():
         with ui.button(icon='menu'):
             with ui.menu(), ui.column().classes('gap-0 p-2'):
                 for column in column_definitions:
-                    ui.switch(column['label'], value=True, on_change=lambda e,
-                            column=column: toggle(column, e.value))
+                    is_visible = column in visible_columns
+                    ui.switch(column['label'], value=is_visible, on_change=lambda e, column=column: toggle(column, e.value))
 
     def remove_table():
         tables_data.remove(table_data)
         display_tables.refresh()
 
-
     with ui.column().classes('mx-2'):
         with ui.row().classes('w-full justify-between items-center'):
-            ui.label(table_data['name']).classes('text-lg my-2 font-bold')
+            ui.label(table_data['table_name']).classes('text-lg my-2 font-bold')
             with ui.row().classes('gap-2'):
                 column_toggle_menu()
                 ui.button(icon='delete', on_click=remove_table).classes('text-red-500')
 
-        table = ui.table(columns=column_definitions, rows=rows, row_key='name').classes('w-96')  # Adjust width as needed
+        # Filter columns based on visibility
+        table = ui.table(columns=visible_columns, rows=table_data['rows'], row_key='name').classes('w-96')
         table.add_slot('body-cell-thumbnail', '''
             <q-td key="thumbnail" :props="props">
                 <q-img :src="props.value" :ratio="1" />
@@ -152,7 +152,7 @@ def add_table():
         new_id += 1
     
     # Append new table data with the unique ID
-    tables_data.append({'id': new_id})
+    tables_data.append(default_table_data)
     display_tables.refresh()
 
 @ui.refreshable
@@ -160,8 +160,7 @@ def display_tables():
     with ui.row().classes('w-full overflow-x-auto'):
         for table_data in tables_data:
             with ui.column().classes('mx-2'):
-                ui.label(f"Table {table_data['id']}").classes('text-lg my-2')
-                ads_table(table_data)
+                data_table_element(table_data)
 
 
 ### PAGES 
