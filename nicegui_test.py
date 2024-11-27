@@ -19,8 +19,6 @@ message_list = [
     }
 ]
 
-
-
 columns = [
     {'name': 'thumbnail', 'label': 'Thumbnail', 'field': 'thumbnail'},
     {'name': 'id', 'label': 'ID', 'field': 'id'},
@@ -30,16 +28,7 @@ columns = [
     {'name': 'email', 'label': 'Email', 'field': 'email'},
     {'name': 'phone', 'label': 'Phone', 'field': 'phone'},
     {'name': 'address', 'label': 'Address', 'field': 'address'},
-    {'name': 'company', 'label': 'Company', 'field': 'company'},
-    {'name': 'position', 'label': 'Position', 'field': 'position'},
-    {'name': 'date_joined', 'label': 'Date Joined', 'field': 'date_joined'},
-    {'name': 'new_column_1', 'label': 'New Column 1', 'field': 'new_column_1'},
-    {'name': 'new_column_2', 'label': 'New Column 2', 'field': 'new_column_2'},
-    {'name': 'new_column_3', 'label': 'New Column 3', 'field': 'new_column_3'},
-    {'name': 'new_column_4', 'label': 'New Column 4', 'field': 'new_column_4'},
 ]
-
-
 
 rows = [
     {'id': 'ADID67', 'name': 'Alice', 'status': 'active', "thumbnail": "https://via.placeholder.com/150"},
@@ -48,25 +37,13 @@ rows = [
     {'id': 'ADID69', 'name': 'Charlie', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 1", "new_column_2": "Data 2"},
     {'id': 'ADID70', 'name': 'David', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 3", "new_column_2": "Data 4"},
     {'id': 'ADID71', 'name': 'Eve', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 5", "new_column_2": "Data 6"},
-    {'id': 'ADID72', 'name': 'Frank', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 7", "new_column_2": "Data 8"},
-    {'id': 'ADID73', 'name': 'Grace', 'status': 'active', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 9", "new_column_2": "Data 10"},
-    {'id': 'ADID74', 'name': 'Heidi', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "new_column_1": "Data 11", "new_column_2": "Data 12"},
 ]
 
+### VARIABLES FOR NEW FEATURE
 
-
+tables_data = [{'id': 1}]  # List to keep track of tables
 
 ### FUNCTIONS
-
-
-
-
-
-
-
-
-
-### COMPONENTS
 
 def chat_window():
     scroll_area = None  # Initialize scroll_area to None
@@ -92,7 +69,7 @@ def chat_window():
     @ui.refreshable
     def display_chat_messages():
         nonlocal scroll_area  # Declare scroll_area as nonlocal to modify it
-        with ui.scroll_area().classes('w-full h-[75vh] border') as scroll_area:
+        with ui.scroll_area().classes('w-full h-[70vh] border') as scroll_area:
             with ui.column().classes('w-full h-full items-stretch'):
                 for message in message_list:
                     if message['role'] == 'user':
@@ -101,8 +78,8 @@ def chat_window():
                         ui.label(f"{message['role']}: {message['content']}").classes('mr-auto my-2')
 
     def text_input():
-        with ui.column().classes('w-full'):
-            with ui.row().classes('w-full no-wrap items-center'):
+        with ui.column().classes('w-full mb-4 pb-4'):
+            with ui.row().classes('w-full no-wrap items-center mb-4'):
                 text = ui.input(placeholder='Type your message here...').props('rounded outlined input-class=mx-3') \
                     .classes('flex-grow')
                 ui.button('Submit', on_click=lambda: on_click(text))
@@ -112,8 +89,7 @@ def chat_window():
         display_chat_messages()
         text_input()
 
-
-def ads_table():
+def ads_table(table_data):
     def toggle(column: Dict, visible: bool) -> None:
         column['classes'] = '' if visible else 'hidden'
         column['headerClasses'] = '' if visible else 'hidden'
@@ -125,29 +101,27 @@ def ads_table():
                 for column in columns:
                     ui.switch(column['label'], value=True, on_change=lambda e,
                             column=column: toggle(column, e.value))
-        
-    def table():
-        table = ui.table(columns=columns, rows=rows, row_key='name')
-        table.add_slot('body-cell-thumbnail', '''
-            <q-td key="thumbnail" :props="props">
-                <q-img :src="props.value" :ratio="1" />
-            </q-td>
-        ''')
 
-    table()
+    table = ui.table(columns=columns, rows=rows, row_key='name').classes('w-96')  # Adjust width as needed
+    table.add_slot('body-cell-thumbnail', '''
+        <q-td key="thumbnail" :props="props">
+            <q-img :src="props.value" :ratio="1" />
+        </q-td>
+    ''')
     return table
 
+def add_table():
+    # Append new table data to tables_data with unique settings
+    tables_data.append({'id': len(tables_data) + 1})
+    display_tables.refresh()
 
-def test_card():
-    with ui.card():
-        ui.label('Test Card')
-
-
-
-
-
-
-
+@ui.refreshable
+def display_tables():
+    with ui.row().classes('w-full overflow-x-auto'):
+        for table_data in tables_data:
+            with ui.column().classes('mx-2'):
+                ui.label(f"Table {table_data['id']}").classes('text-lg my-2')
+                ads_table(table_data)
 
 
 ### PAGES 
@@ -155,14 +129,10 @@ def test_card():
 def main():
     ui.dark_mode().enable()
     with ui.row().classes('w-full h-full items-stretch no-wrap'):
-        with ui.column().classes('w-1/2 h-full'):
+        with ui.column().classes('w-1/4 h-full'):
             chat_window()
-        with ui.column().classes('w-1/2 h-full'):
-            ads_table()
-
-
-    # display_chat_messages()
-    # text_input()
-
+        with ui.column().classes('w-3/4 h-full'):
+            ui.button('Add Table', on_click=add_table).classes('mb-4')
+            display_tables()
 
 ui.run()
