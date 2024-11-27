@@ -19,7 +19,7 @@ message_list = [
     }
 ]
 
-columns = [
+column_definitions = [
     {'name': 'thumbnail', 'label': 'Thumbnail', 'field': 'thumbnail'},
     {'name': 'id', 'label': 'ID', 'field': 'id'},
     {'name': 'name', 'label': 'Name', 'field': 'name'},
@@ -40,11 +40,33 @@ rows = [
 ]
 
 ### VARIABLES FOR NEW FEATURE
+# the table data that will be coming from the back,
+# - call colums by name, 
+tables_data = [
+    {
+        'id': 1,
+        'name': 'thick gurls',
+        'columns': ['thumbnail', 'id', 'name', 'status', 'spend', 'email', 'phone', 'address'],
+        'rows': [
+            {'id': 'ADID67', 'name': 'Alice', 'status': 'active', "thumbnail": "https://via.placeholder.com/150"},
+            {'id': 'ADID68', 'name': 'Bob', 'status': 'inactive', "thumbnail": "https://via.placeholder.com/150", "spend": 100},
+        ]
+    }
+] 
 
-tables_data = [{'id': 1}]  # List to keep track of tables
+# TODO: map the columns from the table data to the column options defined in the columns variable
+
+
+
+
+
+
+
+
+
+
 
 ### FUNCTIONS
-
 def chat_window():
     scroll_area = None  # Initialize scroll_area to None
 
@@ -98,21 +120,39 @@ def ads_table(table_data):
     def column_toggle_menu():
         with ui.button(icon='menu'):
             with ui.menu(), ui.column().classes('gap-0 p-2'):
-                for column in columns:
+                for column in column_definitions:
                     ui.switch(column['label'], value=True, on_change=lambda e,
                             column=column: toggle(column, e.value))
 
-    table = ui.table(columns=columns, rows=rows, row_key='name').classes('w-96')  # Adjust width as needed
-    table.add_slot('body-cell-thumbnail', '''
-        <q-td key="thumbnail" :props="props">
-            <q-img :src="props.value" :ratio="1" />
-        </q-td>
-    ''')
+    def remove_table():
+        tables_data.remove(table_data)
+        display_tables.refresh()
+
+
+    with ui.column().classes('mx-2'):
+        with ui.row().classes('w-full justify-between items-center'):
+            ui.label(table_data['name']).classes('text-lg my-2 font-bold')
+            with ui.row().classes('gap-2'):
+                column_toggle_menu()
+                ui.button(icon='delete', on_click=remove_table).classes('text-red-500')
+
+        table = ui.table(columns=column_definitions, rows=rows, row_key='name').classes('w-96')  # Adjust width as needed
+        table.add_slot('body-cell-thumbnail', '''
+            <q-td key="thumbnail" :props="props">
+                <q-img :src="props.value" :ratio="1" />
+            </q-td>
+        ''')
     return table
 
 def add_table():
-    # Append new table data to tables_data with unique settings
-    tables_data.append({'id': len(tables_data) + 1})
+    # Find the next available ID
+    existing_ids = {table['id'] for table in tables_data}
+    new_id = 1
+    while new_id in existing_ids:
+        new_id += 1
+    
+    # Append new table data with the unique ID
+    tables_data.append({'id': new_id})
     display_tables.refresh()
 
 @ui.refreshable
