@@ -40,6 +40,7 @@ rows = [
 ]
 
 
+
 default_table_data = {
     'id': 1,
     'table_name': 'thick gurls',
@@ -93,6 +94,8 @@ def chat_window():
                 text = ui.input(placeholder='Type your message here...').props('rounded outlined input-class=mx-3') \
                     .classes('flex-grow')
                 ui.button('Submit', on_click=lambda: on_click(text))
+                # Add an event listener for the Enter key
+                text.on('keydown.enter', lambda: on_click(text))
 
     with ui.column().classes('w-full h-full items-stretch'):
         ui.label('Chat Window').classes('text-center text-xl my-4')
