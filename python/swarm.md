@@ -1,4 +1,7 @@
-Usage
+# EXAMPLE CODE FOR OpenAI Swarm
+### AI Agent framework for Python
+
+
 from swarm import Swarm, Agent
 
 client = Swarm()
